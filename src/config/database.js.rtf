@@ -1,0 +1,67 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 const \{ Sequelize \} = require('sequelize');\
+\
+// Create Sequelize instance\
+const sequelize = new Sequelize(\{\
+  dialect: 'sqlite',\
+  storage: './database.sqlite',\
+  logging: process.env.NODE_ENV === 'development' ? console.log : false,\
+  \
+  // Connection pool settings\
+  pool: \{\
+    max: 5,\
+    min: 0,\
+    acquire: 30000,\
+    idle: 10000\
+  \},\
+  \
+  // Define options for all models\
+  define: \{\
+    timestamps: true,\
+    underscored: false,\
+    freezeTableName: true\
+  \}\
+\});\
+\
+// Test database connection\
+async function testConnection() \{\
+  try \{\
+    await sequelize.authenticate();\
+    console.log('\uc0\u9989  Database connection established successfully');\
+    return true;\
+  \} catch (error) \{\
+    console.error('\uc0\u10060  Unable to connect to the database:', error);\
+    return false;\
+  \}\
+\}\
+\
+// Initialize database\
+async function initializeDatabase() \{\
+  try \{\
+    // Test connection\
+    await testConnection();\
+    \
+    // Sync models (create tables if they don't exist)\
+    if (process.env.NODE_ENV === 'development') \{\
+      await sequelize.sync(\{ alter: true \});\
+      console.log('\uc0\u55357 \u56522  Database tables synchronized');\
+    \}\
+    \
+    return true;\
+  \} catch (error) \{\
+    console.error('Database initialization failed:', error);\
+    return false;\
+  \}\
+\}\
+\
+module.exports = \{ \
+  sequelize, \
+  testConnection, \
+  initializeDatabase \
+\};}
